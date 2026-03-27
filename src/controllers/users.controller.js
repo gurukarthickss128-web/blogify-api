@@ -1,17 +1,33 @@
-// src/controllers/users.controller.js
+const userService = require('../services/userService');
 
-const getSingleUser = (req, res) => {
-// Express puts all URL parameters into the `req.params` object.
-// The property name matches the parameter name from our route definition.
-const requestedUserId = req.params.userId;
+const createUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-// Now we have the ID! We can use it to fetch the user from a database.
-// For now, let's just send it back to confirm we got it.
-res.status(200).json({
-  message: `You requested data for User ID: ${requestedUserId}`
-});
+    // Validation
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        error: "All fields are required"
+      });
+    }
+
+    const newUser = await userService.createUser({
+      name,
+      email,
+      password
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: newUser
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
 };
 
-module.exports = {
-getSingleUser,
-};
+module.exports = { createUser };
