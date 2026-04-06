@@ -1,18 +1,25 @@
 // src/index.js
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Middleware: JSON body parser
+// Import main router
+const mainRouter = require('./routes'); // <-- central index router
+
+// Global Middleware
+app.use(cors());
 app.use(express.json());
 
-// Import routes
-const postsRouter = require('./routes/posts.routes');
-app.use('/api/v1/posts', postsRouter);
+// Mount main router with versioned prefix
+app.use('/api/v1', mainRouter);
 
-// Test root route
+// Optional root route
 app.get('/', (req, res) => {
-  res.send('Welcome to Blogify API!');
+  res.status(200).json({
+    success: true,
+    data: { message: 'Welcome to Blogify API!' }
+  });
 });
 
 // Start server
